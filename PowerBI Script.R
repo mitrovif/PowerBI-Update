@@ -91,6 +91,17 @@ group_roster <- group_roster %>%
     iso3_code, Country
   )
 
+group_roster <- group_roster %>%
+  left_join(isocountry, by=c("iso3_code"="name")) %>% # joining to isocountry table since iso3 codes are not available from the data file itself
+  mutate(iso3_code = `alpha_3`) %>% # assigning the iso3_code column the values from alpha_3, which are the iso3 country codes
+  select(1:match("Country", names(group_roster))) %>% # removing everything after the Country column
+  mutate(iso3_code = case_when(Country == "Democratic Republic of the Congo" ~ "COD", # assigning special values (names are different than the ones found in the isocountry table)
+                               Country == "Republic of Moldova" ~ "MDA",
+                               Country == "State of Palestine" ~ "PSE",
+                               Country == "Turkiye" ~ "TUR",
+                               Country == "United Kingdom" ~ "GBR",
+                               TRUE ~ iso3_code)) 
+
 # Rename duplicate columns for final dataset
 colnames(group_roster) <- gsub("_duplicate", "", colnames(group_roster))
 
