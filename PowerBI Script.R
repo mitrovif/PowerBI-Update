@@ -107,6 +107,8 @@ existing_data <- existing_data[, !duplicated(colnames(existing_data))] # removin
 
 existing_data <- existing_data %>%
   mutate(Country = case_when(Country == "Kazakhstan." ~ "Kazakhstan",
+                             Country == "Palestine, State of" ~ "State of Palestine",
+                             Country == "Turkey" ~ "Turkiye",
                              .default = Country))
 
 # # Ensure all columns match before merging
