@@ -2,6 +2,7 @@
 library(dplyr)
 library(readr)
 library(openxlsx)
+library(isocountry)
 
 # Define file paths
 analysis_ready_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
@@ -59,11 +60,6 @@ group_roster <- group_roster %>%
     IROSS = PRO10.C,
     `Type of Example` = slicer_type_of_example,
     
-    # Duplicates (to match Power BI structure)
-    `IRRS_duplicate` = PRO10.A,
-    `IRIS_duplicate` = PRO10.B,
-    `IROSS_duplicate` = PRO10.C,
-    
     `Only IRRS` = ifelse(PRO10.A == 1 & PRO10.B == 0 & PRO10.C == 0, 1, 0),
     `Only IRIS` = ifelse(PRO10.B == 1 & PRO10.A == 0 & PRO10.C == 0, 1, 0),
     `Only IR0SS` = ifelse(PRO10.C == 1 & PRO10.A == 0 & PRO10.B == 0, 1, 0),
@@ -84,34 +80,47 @@ group_roster <- group_roster %>%
   select(
     slicer_year, slicer_region, slicer_type_of_example, slicer_population_group, slicer_phase,
     Examples, `Use Recommendation`, IRRS, IRIS, IROSS, `Type of Example`, 
-    IRRS_duplicate, IRIS_duplicate, IROSS_duplicate,  # Duplicated Columns
     `Only IRRS`, `Only IRIS`, `Only IR0SS`, mixed_recommendation, 
     Survey, `Administrative Data`, Census, `Data Integration`, 
     `Non-traditional`, Strategy, `Guidance/Toolkit`, `Workshop/Training`, 
     iso3_code, Country
   )
 
-# Rename duplicate columns for final dataset
-colnames(group_roster) <- gsub("_duplicate", "", colnames(group_roster))
+group_roster <- group_roster %>%
+  left_join(isocountry, by=c("iso3_code"="name")) %>%
+  mutate(iso3_code = `alpha_3`) %>%
+  select(1:match("Country", names(group_roster))) %>%
+  mutate(iso3_code = case_when(Country == "Democratic Republic of the Congo" ~ "COD",
+                               Country == "Republic of Moldova" ~ "MDA",
+                               Country == "State of Palestine" ~ "PSE",
+                               Country == "Turkiye" ~ "TUR",
+                               Country == "United Kingdom" ~ "GBR",
+                               TRUE ~ iso3_code))
 
 # Save the transformed group roster data separately
 write.xlsx(group_roster, temp_output_file)
 
 # Load existing Power BI data file
 existing_data <- read.xlsx(data_file, sheet = 1)
+colnames(existing_data) <- gsub("\\.", " ", colnames(existing_data)) # replacing the periods (.) with spaces ( )
+existing_data <- existing_data[, !duplicated(colnames(existing_data))] # removing the duplicate columns
 
-# Ensure all columns match before merging
-all_columns <- colnames(existing_data)
+existing_data <- existing_data %>%
+  mutate(Country = case_when(Country == "Kazakhstan." ~ "Kazakhstan",
+                             .default = Country))
 
-# Ensure group_roster has the same structure by adding missing columns
-for (col in all_columns) {
-  if (!(col %in% colnames(group_roster))) {
-    group_roster[[col]] <- NA  # Add missing columns with NA values
-  }
-}
+# # Ensure all columns match before merging
+# all_columns <- colnames(existing_data)
 
-# Reorder columns to match existing data file
-group_roster <- group_roster[, all_columns]
+# # Ensure group_roster has the same structure by adding missing columns
+# for (col in all_columns) {
+#   if (!(col %in% colnames(group_roster))) {
+#     group_roster[[col]] <- NA  # Add missing columns with NA values
+#   }
+# }
+
+# # Reorder columns to match existing data file
+# group_roster <- group_roster[, all_columns]
 
 # Merge the new transformed data with the existing data
 updated_data <- bind_rows(existing_data, group_roster)
