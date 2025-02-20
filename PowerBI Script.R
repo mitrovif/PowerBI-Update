@@ -97,6 +97,13 @@ group_roster <- group_roster %>%
                                Country == "United Kingdom" ~ "GBR",
                                TRUE ~ iso3_code))
 
+# Recode the 2s and 8s to be 0s (not using recs) & 'Other' regions as blanks
+group_roster <- group_roster %>% 
+  mutate(`Use Recommendation` = case_when(`Use Recommendation` == 2 | `Use Recommendation` == 8 ~ 0,
+                                          .default = `Use Recommendation`),
+         slicer_region = case_when(slicer_region == "Other" ~ NA,
+                                   .default = `slicer_region`))
+
 # Save the transformed group roster data separately
 write.xlsx(group_roster, temp_output_file)
 
