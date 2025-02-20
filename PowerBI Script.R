@@ -59,6 +59,15 @@ group_roster <- group_roster %>%
     IRIS = PRO10.B,
     IROSS = PRO10.C,
     `Type of Example` = slicer_type_of_example,
+
+    slicer_userecs = case_when(
+      `Use Recommendation` == 0 ~ "No",
+      `Use Recommendation` == 1 ~ "Yes",
+      `Use Recommendation` == 2 ~ "No",
+      `Use Recommendation` == 8 ~ "No",
+      is.na(`Use Recommendation`) ~ "No",
+      TRUE ~ NA_character_
+    ),
     
     `Only IRRS` = ifelse(PRO10.A == 1 & PRO10.B == 0 & PRO10.C == 0, 1, 0),
     `Only IRIS` = ifelse(PRO10.B == 1 & PRO10.A == 0 & PRO10.C == 0, 1, 0),
