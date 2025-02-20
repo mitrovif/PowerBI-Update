@@ -111,11 +111,6 @@ group_roster <- group_roster %>%
     slicer_region = case_when(
       slicer_region == "Other" ~ NA_character_,
       TRUE ~ slicer_region
-    ),
-    # Create `slicer_userecs` based on the updated `Use Recommendation`
-    slicer_userecs = case_when(
-      `Use Recommendation` == 1 ~ "Yes",
-      TRUE ~ "No"  # This should handle all 0s, 2s, 8s, and NAs as "No"
     )
   )
 
@@ -147,7 +142,11 @@ existing_data <- existing_data %>%
 # group_roster <- group_roster[, all_columns]
 
 # Merge the new transformed data with the existing data
-updated_data <- bind_rows(existing_data, group_roster)
+updated_data <- bind_rows(existing_data, group_roster) %>%
+  mutate(slicer_userecs = case_when( # Create `slicer_userecs` based on the updated `Use Recommendation`
+  `Use Recommendation` == 1 ~ "Yes",
+  TRUE ~ "No"  # This should handle all 0s, 2s, 8s, and NAs as "No"
+))
 
 # Save the merged file
 write.xlsx(updated_data, output_file)
