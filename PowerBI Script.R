@@ -97,6 +97,23 @@ group_roster <- group_roster %>%
                                Country == "United Kingdom" ~ "GBR",
                                TRUE ~ iso3_code))
 
+# Recode the 2s and 8s to be 0s (not using recs) & 'Other' regions as blanks
+group_roster <- group_roster %>%
+  mutate(
+    # Update `Use Recommendation` first
+    `Use Recommendation` = case_when(
+      `Use Recommendation` == 2 | `Use Recommendation` == 8 ~ 0,
+      TRUE ~ `Use Recommendation`
+    )
+  ) %>%
+  mutate(
+    # Update `slicer_region`
+    slicer_region = case_when(
+      slicer_region == "Other" ~ NA_character_,
+      TRUE ~ slicer_region
+    )
+  )
+
 # Save the transformed group roster data separately
 write.xlsx(group_roster, temp_output_file)
 
@@ -125,7 +142,11 @@ existing_data <- existing_data %>%
 # group_roster <- group_roster[, all_columns]
 
 # Merge the new transformed data with the existing data
-updated_data <- bind_rows(existing_data, group_roster)
+updated_data <- bind_rows(existing_data, group_roster) %>%
+  mutate(slicer_userecs = case_when( # Create `slicer_userecs` based on the updated `Use Recommendation`
+  `Use Recommendation` == 1 ~ "Yes",
+  TRUE ~ "No"  # This should handle all 0s, 2s, 8s, and NAs as "No"
+))
 
 # Save the merged file
 write.xlsx(updated_data, output_file)
