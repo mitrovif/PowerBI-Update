@@ -130,6 +130,43 @@ updated_data <- bind_rows(existing_data, group_roster)
 # Save the merged file
 write.xlsx(updated_data, output_file)
 
-# Print completion message
-print("Data has been successfully updated and saved to: data_updated.xlsx")
 
+
+#==================================================
+# Title: Index and Update ISO Country Codes with Latitude and Longitude
+#==================================================
+library(dplyr)
+library(readr)
+library(readxl)
+library(writexl)
+library(countrycode)
+
+# File Paths
+file1 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2023/08 Output/01 Dashboard/01_Data/data_updated.xlsx"
+file2 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2023/08 Output/01 Dashboard/01_Data/world_country_and_usa_states_latitude_and_longitude_values.csv"
+output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2023/08 Output/01 Dashboard/01_Data/data_updated_with_latlon.xlsx"
+
+# Load the datasets
+data1 <- read_excel(file1)
+data2 <- read_csv(file2)
+
+# Generate ISO-3 codes in data2 based on country names
+data2 <- data2 %>%
+  mutate(iso3c = countrycode(country, "country.name", "iso3c"))
+
+# Ensure we only keep rows with valid ISO-3 codes that exist in data1
+data2 <- data2 %>% filter(!is.na(iso3c) & iso3c %in% data1$iso3_code)
+
+# Merge datasets based on ISO-3 codes, copying all columns from data2 to data1 but ensuring NA values are preserved in data1
+data1 <- data1 %>%
+  left_join(data2, by = c("iso3_code" = "iso3c"))
+
+# Save the updated dataset
+write_xlsx(data1, output_file)
+
+# Count the number of matched ISO-3 codes
+num_matches <- sum(!is.na(data1$latitude))
+
+# Print completion message
+message("Updated dataset saved successfully at: ", output_file)
+message("Number of matched ISO-3 codes: ", num_matches)
