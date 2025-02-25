@@ -10,13 +10,6 @@ data_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of 
 output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/data_updated.xlsx"
 temp_output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/temp_data.xlsx"
 
-# Check if files exist before proceeding
-if (!file.exists(analysis_ready_file)) {
-  stop("Error: Analysis Ready File does not exist.")
-}
-if (!file.exists(data_file)) {
-  stop("Error: Data File does not exist.")
-}
 
 # Load analysis ready data
 group_roster <- read_csv(analysis_ready_file, show_col_types = FALSE) %>% 
