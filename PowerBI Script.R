@@ -156,9 +156,9 @@ library(writexl)
 library(countrycode)
 
 # File Paths
-file1 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2023/08 Output/01 Dashboard/01_Data/data_updated.xlsx"
-file2 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2023/08 Output/01 Dashboard/01_Data/world_country_and_usa_states_latitude_and_longitude_values.csv"
-output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2023/08 Output/01 Dashboard/01_Data/data_updated_with_latlon.xlsx"
+file1 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/data_updated.xlsx"
+file2 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/world_country_and_usa_states_latitude_and_longitude_values.csv"
+output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/data_updated_with_latlon.xlsx"
 
 # Load the datasets
 data1 <- read_excel(file1)
