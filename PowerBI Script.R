@@ -5,11 +5,12 @@ library(openxlsx)
 library(isocountry)
 
 # Define file paths
-analysis_ready_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
-data_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/data.xlsx"
-output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/data_updated.xlsx"
-temp_output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/temp_data.xlsx"
+setwd("C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024")
 
+analysis_ready_file <- "10 Data/Analysis Ready Files/analysis_ready_group_roster.csv"
+data_file <- "08 Output/Dashboard Updates/01_Data/data.xlsx"
+output_file <- "08 Output/Dashboard Updates/01_Data/data_updated.xlsx"
+temp_output_file <- "08 Output/Dashboard Updates/01_Data/temp_data.xlsx"
 
 # Load analysis ready data
 group_roster <- read_csv(analysis_ready_file, show_col_types = FALSE) %>% 
@@ -144,11 +145,10 @@ updated_data <- bind_rows(existing_data, group_roster) %>%
 # Save the merged file
 write.xlsx(updated_data, output_file)
 
-
-
 #==================================================
 # Title: Index and Update ISO Country Codes with Latitude and Longitude
 #==================================================
+
 library(dplyr)
 library(readr)
 library(readxl)
@@ -156,24 +156,29 @@ library(writexl)
 library(countrycode)
 
 # File Paths
-file1 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/data_updated.xlsx"
-file2 <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/world_country_and_usa_states_latitude_and_longitude_values.csv"
-output_file <- "C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024/08 Output/Dashboard Updates/01_Data/data_updated_with_latlon.xlsx"
+setwd("C:/Users/mitro/UNHCR/EGRISS Secretariat - 905 - Implementation of Recommendations/01_GAIN Survey/Integration & GAIN Survey/EGRISS GAIN Survey 2024")
+
+file1 <- "08 Output/Dashboard Updates/01_Data/data_updated.xlsx"
+file2 <- "08 Output/Dashboard Updates/01_Data/world_country_and_usa_states_latitude_and_longitude_values.csv"
+output_file <- "01_Data/data_updated_with_latlon.xlsx"
 
 # Load the datasets
 data1 <- read_excel(file1)
 data2 <- read_csv(file2)
 
-# Generate ISO-3 codes in data2 based on country names
+# Generate ISO-3 codes and ISO-2 codes in data2 and data1 based on country names
 data2 <- data2 %>%
   mutate(iso3c = countrycode(country, "country.name", "iso3c"))
+
+data1 <- data1 %>%
+  mutate(iso2c = countrycode(Country, "country.name", "iso2c"))
 
 # Ensure we only keep rows with valid ISO-3 codes that exist in data1
 data2 <- data2 %>% filter(!is.na(iso3c) & iso3c %in% data1$iso3_code)
 
 # Merge datasets based on ISO-3 codes, copying all columns from data2 to data1 but ensuring NA values are preserved in data1
 data1 <- data1 %>%
-  left_join(data2, by = c("iso3_code" = "iso3c"))
+  left_join(data2, by = c("iso2c" = "country_code"))
 
 # Save the updated dataset
 write_xlsx(data1, output_file)
