@@ -168,10 +168,22 @@ data2 <- read_csv(file2)
 
 # Generate ISO-3 codes and ISO-2 codes in data2 and data1 based on country names
 data2 <- data2 %>%
-  mutate(iso3c = countrycode(country, "country.name", "iso3c"))
+  arrange(country) %>%  # Sort by country_code
+  group_by(country) %>%  # Group by country_code
+  slice_head(n = 1) %>%  # Keep the first entry of each group
+  ungroup()
+
+data2 <- data2 %>%
+  mutate(iso3c = countrycode(country, "country.name", "iso3c")) %>%
+  mutate(iso3c = case_when(country == "Kosovo" ~ "XKX",
+                           .default = iso3c))
 
 data1 <- data1 %>%
-  mutate(iso2c = countrycode(Country, "country.name", "iso2c"))
+  mutate(iso2c = countrycode(Country, "country.name", "iso2c")) %>%
+  mutate(iso2c = case_when(Country == "Kosovo*" ~ "XK",
+                           .default = iso2c)) %>%
+  mutate(iso3_code = case_when(Country == "Kosovo*" ~ "XKX",
+                           .default = iso3_code))
 
 # Ensure we only keep rows with valid ISO-3 codes that exist in data1
 data2 <- data2 %>% filter(!is.na(iso3c) & iso3c %in% data1$iso3_code)
