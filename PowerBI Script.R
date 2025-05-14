@@ -54,10 +54,11 @@ group_roster <- group_roster %>%
     IROSS = PRO10.C,
     `Type of Example` = slicer_type_of_example,
     
-    `Only IRRS` = ifelse(PRO10.A == 1 & PRO10.B == 0 & PRO10.C == 0, 1, 0),
-    `Only IRIS` = ifelse(PRO10.B == 1 & PRO10.A == 0 & PRO10.C == 0, 1, 0),
-    `Only IR0SS` = ifelse(PRO10.C == 1 & PRO10.A == 0 & PRO10.B == 0, 1, 0),
+    `Only IRRS` = ifelse(PRO10.A == 1 & (PRO10.B == 0 | is.na(PRO10.B)) & (PRO10.C == 0 | is.na(PRO10.C)), 1, 0),
+    `Only IRIS` = ifelse(PRO10.B == 1 & (PRO10.A == 0 | is.na(PRO10.A)) & (PRO10.C == 0 | is.na(PRO10.C)), 1, 0),
+    `Only IR0SS` = ifelse(PRO10.C == 1 & (PRO10.A == 0 | is.na(PRO10.A)) & (PRO10.B == 0 | is.na(PRO10.B)), 1, 0),
     mixed_recommendation = ifelse(PRO10.A + PRO10.B + PRO10.C >= 2, 1, 0),
+    undetermined_recommendation = (ifelse((PRO09 == 1 & PRO10.Z == 1) | (PRO09 == 1 & is.na(PRO10.A) & is.na(PRO10.B) & is.na(PRO10.C) & is.na(PRO10.Z)), 1, NA)),
     
     Survey = PRO08.A,
     `Administrative Data` = PRO08.B,
@@ -74,7 +75,7 @@ group_roster <- group_roster %>%
   select(
     slicer_year, slicer_region, slicer_type_of_example, slicer_population_group, slicer_phase,
     Examples, `Use Recommendation`, IRRS, IRIS, IROSS, `Type of Example`, 
-    `Only IRRS`, `Only IRIS`, `Only IR0SS`, mixed_recommendation, 
+    `Only IRRS`, `Only IRIS`, `Only IR0SS`, mixed_recommendation, undetermined_recommendation,
     Survey, `Administrative Data`, Census, `Data Integration`, 
     `Non-traditional`, Strategy, `Guidance/Toolkit`, `Workshop/Training`, 
     iso3_code, Country
