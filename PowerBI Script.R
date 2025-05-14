@@ -120,7 +120,10 @@ existing_data <- existing_data %>%
   mutate(Country = case_when(Country == "Kazakhstan." ~ "Kazakhstan",
                              Country == "Palestine, State of" ~ "State of Palestine",
                              Country == "Turkey" ~ "Turkiye",
-                             .default = Country))
+                             .default = Country)) %>%
+  mutate(slicer_phase = case_when(slicer_phase == "Design/Panning" ~ "Design/Planning",
+                                  slicer_phase == "Don't Know" ~ "Don't Know/Undetermined",
+                                  .default = slicer_phase))
 
 # # Ensure all columns match before merging
 # all_columns <- colnames(existing_data)
